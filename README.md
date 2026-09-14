@@ -150,9 +150,12 @@ match "xyz"*). There are no blank screens and no unhandled promise rejections.
 - **No request cancellation on the wire.** In-flight fetches are ignored rather
   than aborted; with `AbortController` threaded through `api.ts` this would be a
   small change.
-- **Images go through the Next optimizer** with a capped size set. A grid page
-  requests 24 sprites at once from GitHub's CDN, so on a slow link the first paint
-  of the grid can lag behind the cards.
+- **Image delivery is tuned rather than solved.** Sprites go through the Next
+  optimizer with a capped candidate-width set, a 30-day cache TTL, and the first
+  row loaded eagerly while the rest lazy-load — an uncapped set requesting all 24
+  at once made the optimizer time out against GitHub's CDN on a slow link. A
+  self-hosted sprite mirror or a CDN in front of the optimizer would be the real
+  fix.
 
 ## With more time
 
