@@ -1,15 +1,28 @@
 /**
  * All PokeAPI access for the browse feature. Zero JSX, zero React — fetching
- * lives here so presentation components stay dumb and this file stays testable
- * and swappable (a detail page or a server-side route would reuse it as-is).
+ * lives here so presentation components stay dumb and the strategy stays
+ * swappable behind one module.
  *
- * Strategy note: PokeAPI has no search endpoint. We therefore fetch the full
- * name index once (names + URLs only, ~1MB, cached in module scope), filter it
- * client-side, and lazily hydrate details for the visible page of results only.
+ * ── Data strategy ───────────────────────────────────────────────────────────
+ * PokeAPI has no search endpoint, and `/pokemon?limit=10000` returns names and
+ * URLs only — no types — which would force one detail request per visible card
+ * and make "search by type" impossible without fetching all ~1300 of them.
+ *
+ * Walking the 18 type endpoints instead inverts the problem: 18 parallel
+ * requests return every Pokémon *grouped by type*, which is exactly the join we
+ * need. One pass builds the full id → {name, types} index, artwork URLs are
+ * derived from the id, and no per-card request is ever made. Searching by name,
+ * dex number or type is then pure client-side filtering.
+ *
+ * Cost: a slightly heavier first load, in exchange for no request waterfall,
+ * instant pagination, and type search. The whole index is cached in module
+ * scope and evicted on failure so retry genuinely re-requests.
  */
 
 import {
-  toPokemonTypeName,
+  artworkUrl,
+  isPokemonTypeName,
+  POKEMON_TYPES,
   type PokemonSummary,
   type PokemonTypeName,
 } from '@/shared/types/pokemon';
@@ -17,39 +30,22 @@ import {
 const API_BASE = 'https://pokeapi.co/api/v2';
 
 /** How many cards one "page" of the grid holds. */
-export const PAGE_SIZE = 24;
+export const PAGE_SIZE = 48;
+
+/**
+ * PokeAPI ids above this are alternate forms (megas, regionals, totems). The
+ * design shows the base National Dex only, which keeps the grid coherent.
+ */
+const MAX_BASE_DEX_ID = 10000;
 
 /* ── Wire formats ─────────────────────────────────────────────────────────── */
 
-export interface PokemonIndexEntry {
+interface TypeResponse {
   name: string;
-  url: string;
-}
-
-interface PokemonListResponse {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: PokemonIndexEntry[];
-}
-
-interface PokemonTypeSlot {
-  slot: number;
-  type: { name: string; url: string };
-}
-
-interface PokemonDetailResponse {
-  id: number;
-  name: string;
-  types: PokemonTypeSlot[];
-  sprites: {
-    front_default: string | null;
-    other?: {
-      'official-artwork'?: {
-        front_default: string | null;
-      };
-    };
-  };
+  pokemon: Array<{
+    slot: number;
+    pokemon: { name: string; url: string };
+  }>;
 }
 
 /* ── Fetch plumbing ───────────────────────────────────────────────────────── */
@@ -61,112 +57,96 @@ export class PokeApiError extends Error {
   }
 }
 
-async function fetchJson<T>(url: string, signal?: AbortSignal): Promise<T> {
+async function fetchJson<T>(url: string): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(url, { signal });
-  } catch (cause) {
-    if (cause instanceof DOMException && cause.name === 'AbortError') throw cause;
-    throw new PokeApiError('Could not reach PokéAPI. Check your connection and try again.');
+    response = await fetch(url);
+  } catch {
+    throw new PokeApiError('Network error');
   }
 
   if (!response.ok) {
-    throw new PokeApiError(`PokéAPI responded with ${response.status}.`);
+    throw new PokeApiError(`Server responded ${response.status}`);
   }
 
   return (await response.json()) as T;
 }
 
-/* ── Index (cached in module scope, per the data strategy) ─────────────────── */
+const ID_IN_URL = /\/(\d+)\/?$/;
 
-let indexPromise: Promise<PokemonIndexEntry[]> | null = null;
+function idFromUrl(url: string): number | null {
+  const match = ID_IN_URL.exec(url);
+  return match ? Number(match[1]) : null;
+}
 
-/**
- * The full name index, fetched at most once per page load. On failure the cache
- * is cleared so a retry can genuinely re-request.
- */
-export function fetchPokemonIndex(): Promise<PokemonIndexEntry[]> {
-  indexPromise ??= fetchJson<PokemonListResponse>(`${API_BASE}/pokemon?limit=10000&offset=0`)
-    .then((data) => data.results)
-    .catch((error: unknown) => {
-      indexPromise = null;
-      throw error;
-    });
+/* ── The index ────────────────────────────────────────────────────────────── */
+
+let indexPromise: Promise<PokemonSummary[]> | null = null;
+
+async function buildIndex(): Promise<PokemonSummary[]> {
+  const responses = await Promise.all(
+    POKEMON_TYPES.map((_, position) =>
+      fetchJson<TypeResponse>(`${API_BASE}/type/${position + 1}`),
+    ),
+  );
+
+  // slot 1 is the primary type, slot 2 the secondary — the array index keeps
+  // them in the order PokeAPI itself reports.
+  const byId = new Map<number, { id: number; name: string; types: PokemonTypeName[] }>();
+
+  for (const type of responses) {
+    if (!isPokemonTypeName(type.name)) continue;
+
+    for (const { slot, pokemon } of type.pokemon) {
+      const id = idFromUrl(pokemon.url);
+      if (id === null || id > MAX_BASE_DEX_ID) continue;
+
+      let entry = byId.get(id);
+      if (!entry) {
+        entry = { id, name: pokemon.name, types: [] };
+        byId.set(id, entry);
+      }
+      entry.types[slot - 1] = type.name;
+    }
+  }
+
+  return [...byId.values()]
+    .map(({ id, name, types }) => ({
+      id,
+      name,
+      spriteUrl: artworkUrl(id),
+      // A sparse slot 2 leaves a hole; filtering collapses it.
+      types: types.filter(Boolean),
+    }))
+    .sort((a, b) => a.id - b.id);
+}
+
+/** The full Pokédex, fetched at most once per page load. */
+export function fetchPokedex(): Promise<PokemonSummary[]> {
+  indexPromise ??= buildIndex().catch((error: unknown) => {
+    indexPromise = null;
+    throw error;
+  });
 
   return indexPromise;
 }
 
-/* ── Details (memoised per name) ──────────────────────────────────────────── */
-
-const detailCache = new Map<string, Promise<PokemonSummary>>();
-
-function toSummary(detail: PokemonDetailResponse): PokemonSummary {
-  const artwork = detail.sprites.other?.['official-artwork']?.front_default ?? null;
-
-  const types: PokemonTypeName[] = [...detail.types]
-    .sort((a, b) => a.slot - b.slot)
-    .map((slot) => toPokemonTypeName(slot.type.name));
-
-  return {
-    id: detail.id,
-    name: detail.name,
-    spriteUrl: artwork ?? detail.sprites.front_default,
-    types,
-  };
-}
-
-export function fetchPokemonDetail(name: string): Promise<PokemonSummary> {
-  const cached = detailCache.get(name);
-  if (cached) return cached;
-
-  const request = fetchJson<PokemonDetailResponse>(`${API_BASE}/pokemon/${name}`)
-    .then(toSummary)
-    .catch((error: unknown) => {
-      detailCache.delete(name);
-      throw error;
-    });
-
-  detailCache.set(name, request);
-  return request;
-}
+/* ── Filtering ────────────────────────────────────────────────────────────── */
 
 /**
- * Hydrates a page of index entries. Individual failures are tolerated (PokeAPI
- * has a handful of flaky form entries) — the caller only sees an error when the
- * whole batch fails, which is the signal that something is actually wrong.
+ * Matches a Pokémon by name, dex number or type, case-insensitively.
+ * Pure and exported so it can be reasoned about (and tested) without a network.
  */
-export async function fetchPokemonDetails(names: string[]): Promise<PokemonSummary[]> {
-  if (names.length === 0) return [];
-
-  const settled = await Promise.allSettled(names.map((name) => fetchPokemonDetail(name)));
-  const fulfilled = settled
-    .filter((result): result is PromiseFulfilledResult<PokemonSummary> => result.status === 'fulfilled')
-    .map((result) => result.value);
-
-  if (fulfilled.length === 0) {
-    throw new PokeApiError('Could not load Pokémon details. Please try again.');
-  }
-
-  return fulfilled;
-}
-
-/** Case-insensitive substring match, exact and prefix hits first. */
-export function filterPokemonIndex(
-  index: PokemonIndexEntry[],
-  query: string,
-): PokemonIndexEntry[] {
+export function filterPokedex(pokedex: PokemonSummary[], query: string): PokemonSummary[] {
   const needle = query.trim().toLowerCase();
-  if (!needle) return index;
+  if (!needle) return pokedex;
 
-  const exact: PokemonIndexEntry[] = [];
-  const prefix: PokemonIndexEntry[] = [];
-  const contains: PokemonIndexEntry[] = [];
+  const asNumber = needle.replace('#', '');
 
-  for (const entry of index) {
-    if (entry.name === needle) exact.push(entry);
-    else if (entry.name.startsWith(needle)) prefix.push(entry);
-    else if (entry.name.includes(needle)) contains.push(entry);
-  }
-
-  return [...exact, ...prefix, ...contains];
+  return pokedex.filter(
+    (pokemon) =>
+      pokemon.name.includes(needle) ||
+      String(pokemon.id) === asNumber ||
+      pokemon.types.some((type) => type === needle),
+  );
 }
