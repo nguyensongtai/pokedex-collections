@@ -1,0 +1,75 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: var(--nav-height);
+  padding: 0 clamp(1rem, 4vw, 2.5rem);
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-right: auto;
+  padding: 0.25rem 0.4rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display), sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  text-decoration: none;
+  color: var(--text);
+  transition: color var(--dur-fast) var(--ease);
+}
+
+.brand:hover {
+  color: var(--accent-strong);
+}
+
+.mark {
+  display: inline-block;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  background: linear-gradient(180deg, var(--heart) 0 48%, var(--surface) 48% 52%, #2b2d36 52% 100%);
+  box-shadow: inset 0 0 0 1.5px #2b2d36;
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.main {
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 4vw, 2.5rem) 4rem;
+}
+
+.footer {
+  margin-top: auto;
+  padding: 1.5rem clamp(1rem, 4vw, 2.5rem) 2rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-subtle);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.footer a {
+  color: var(--text-muted);
+  text-underline-offset: 2px;
+}
