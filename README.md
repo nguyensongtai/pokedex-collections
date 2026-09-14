@@ -1,5 +1,9 @@
 # PokéDex Collections
 
+[![CI](https://github.com/nguyensongtai/pokedex-collections/actions/workflows/ci.yml/badge.svg)](https://github.com/nguyensongtai/pokedex-collections/actions/workflows/ci.yml)
+
+**Repository:** https://github.com/nguyensongtai/pokedex-collections
+
 A two-page Pokémon fan site: browse the full National Pokédex with search-as-you-type,
 and organise your favourites into custom groups that survive a reload. English and
 Vietnamese.
