@@ -1,24 +1,23 @@
 .card {
   position: relative;
-  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
 }
 
 .interactive {
   transition:
-    transform var(--dur-mid) var(--ease-spring),
+    transform var(--dur-mid) var(--ease),
     box-shadow var(--dur-mid) var(--ease),
     border-color var(--dur-mid) var(--ease);
 }
 
 .interactive:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--border-strong);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: #dedede;
 }
 
 .interactive:focus-within {
-  border-color: var(--border-strong);
+  border-color: #dedede;
 }
