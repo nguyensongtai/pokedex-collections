@@ -37,7 +37,7 @@ export interface FavouriteGroup {
 export interface FavouriteEntry {
   id: number;
   name: string;
-  spriteUrl: string | null;
+  spriteUrl: string;
   types: PokemonTypeName[];
   /** `UNGROUPED_ID` for anything not filed into a user-created group. */
   groupId: string;
@@ -199,8 +199,14 @@ export interface GroupedFavourites {
 
 /**
  * Pure selector, exported so it is unit-testable without React.
+ *
  * User groups come first in creation order; the virtual Ungrouped section is
- * appended last and only when it actually holds something.
+ * appended last. It is shown when it holds something, and also when no user
+ * groups exist at all — in that case it is the whole board, and hiding it would
+ * leave the page blank while favourites exist.
+ *
+ * Its *label* is chosen by the view ("Unsorted" vs "All favourites", in the
+ * active language); the store only knows the stable id.
  */
 export function groupFavourites(
   favourites: FavouriteEntry[],
@@ -214,7 +220,9 @@ export function groupFavourites(
   const knownIds = new Set(groups.map((group) => group.id));
   const ungrouped = favourites.filter((entry) => !knownIds.has(entry.groupId));
 
-  return ungrouped.length > 0 ? [...sections, { group: UNGROUPED_GROUP, entries: ungrouped }] : sections;
+  const showUngrouped = ungrouped.length > 0 || groups.length === 0;
+
+  return showUngrouped ? [...sections, { group: UNGROUPED_GROUP, entries: ungrouped }] : sections;
 }
 
 /* ── Hydration ────────────────────────────────────────────────────────────── */

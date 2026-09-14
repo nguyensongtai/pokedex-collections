@@ -1,26 +1,40 @@
 .button {
-  /* Touch target requirement: always at least 44x44 and never hover-revealed. */
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 36px;
+  height: 36px;
   padding: 0;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--surface) 88%, transparent);
-  backdrop-filter: blur(6px);
-  color: var(--text-subtle);
+  background: rgb(255 255 255 / 90%);
+  color: #9a9a9a;
   cursor: pointer;
   transition:
     background-color var(--dur-fast) var(--ease),
-    border-color var(--dur-fast) var(--ease),
     color var(--dur-fast) var(--ease);
 }
 
+/* The design draws a 36px control; this keeps the *tap target* at 44x44 so it
+   still clears the touch guideline without changing the visual. */
+.button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
 .button:hover {
-  border-color: color-mix(in srgb, var(--heart) 45%, transparent);
-  color: var(--heart);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.button:active {
+  transform: scale(0.9);
 }
 
 .button:focus-visible {
@@ -28,46 +42,30 @@
   outline-offset: 2px;
 }
 
-.button:active .heart {
-  transform: scale(0.88);
-}
-
 .heart {
-  width: 1.35rem;
-  height: 1.35rem;
+  width: 18px;
+  height: 18px;
   fill: none;
   stroke: currentcolor;
-  stroke-width: 1.7;
+  stroke-width: 2;
   stroke-linejoin: round;
-  transition: transform var(--dur-fast) var(--ease);
 }
 
 .button[aria-pressed='true'] {
-  border-color: color-mix(in srgb, var(--heart) 40%, transparent);
-  background: color-mix(in srgb, var(--heart) 12%, var(--surface));
-  color: var(--heart);
+  color: var(--accent);
 }
 
 .button[aria-pressed='true'] .heart {
   fill: currentcolor;
-  /* Springy "pop" the moment the pressed state flips on. */
-  animation: heart-pop var(--dur-slow) var(--ease-spring);
 }
 
-@keyframes heart-pop {
-  0% {
-    transform: scale(0.7);
-  }
-  55% {
-    transform: scale(1.28);
-  }
-  100% {
-    transform: scale(1);
-  }
+/* Applied only on the click that turns the heart on. */
+.popping {
+  animation: pdc-pop 0.4s var(--ease-spring);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .button[aria-pressed='true'] .heart {
+  .popping {
     animation: none;
   }
 }

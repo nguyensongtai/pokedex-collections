@@ -26,7 +26,7 @@ const pikachu: PokemonSummary = {
 const bulbasaur: PokemonSummary = {
   id: 1,
   name: 'bulbasaur',
-  spriteUrl: null,
+  spriteUrl: 'https://example.test/bulbasaur.png',
   types: ['grass', 'poison'],
 };
 
@@ -165,6 +165,17 @@ describe('derivation', () => {
     expect(sections).toHaveLength(1);
     expect(sections[0].group.id).toBe(id);
   });
+
+  it('keeps the Ungrouped section when no user groups exist', () => {
+    // It is the whole board in that case, so hiding it would blank the page.
+    store().addFavourite(pikachu);
+
+    const sections = groupFavourites(store().favourites, store().groups);
+
+    expect(sections).toHaveLength(1);
+    expect(sections[0].group.id).toBe(UNGROUPED_ID);
+    expect(sections[0].entries.map((entry) => entry.id)).toEqual([pikachu.id]);
+  });
 });
 
 describe('hydration', () => {
@@ -173,7 +184,7 @@ describe('hydration', () => {
     const entry: FavouriteEntry = {
       id: 25,
       name: 'pikachu',
-      spriteUrl: null,
+      spriteUrl: 'https://example.test/pikachu.png',
       types: ['electric'],
       groupId: 'g1',
       addedAt: 2,

@@ -1,9 +1,9 @@
 /**
  * Public API of the `favourites` feature.
  *
- * Everything outside this folder — pages and the `pokemon-browse` feature —
- * imports from here and never deep-imports internals. Adding a component or
- * splitting the store is therefore a local change.
+ * Everything outside this folder — pages, the app shell, and the
+ * `pokemon-browse` feature — imports from here and never deep-imports
+ * internals. Adding a component or splitting the store is a local change.
  */
 export { FavouriteButton } from './components/FavouriteButton';
 export { FavouritesBoard } from './components/FavouritesBoard';
