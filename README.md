@@ -2,7 +2,8 @@
 
 [![CI](https://github.com/nguyensongtai/pokedex-collections/actions/workflows/ci.yml/badge.svg)](https://github.com/nguyensongtai/pokedex-collections/actions/workflows/ci.yml)
 
-**Repository:** https://github.com/nguyensongtai/pokedex-collections
+- **Live site:** https://pokedex-collections.vercel.app
+- **Repository:** https://github.com/nguyensongtai/pokedex-collections
 
 A two-page Pokémon fan site: browse the full National Pokédex with search-as-you-type,
 and organise your favourites into custom groups that survive a reload. English and
@@ -249,10 +250,22 @@ click that turns it on, so a page of saved favourites doesn't pop on load.
 
 ---
 
-## CI
+## CI/CD
 
-`.github/workflows/ci.yml` runs on every push and pull request:
-install → lint → typecheck → test → build.
+Two pipelines, both triggered by a push to `master`:
+
+- **CI** — `.github/workflows/ci.yml` runs on every push and pull request:
+  install → lint → typecheck → test → build. The badge at the top of this file
+  reports the latest run.
+- **CD** — Vercel builds and deploys the same commit to
+  https://pokedex-collections.vercel.app. Pull requests get their own preview
+  deployment.
+
+Vercel handles the deploy rather than a job in the workflow: it is the first-party
+host for Next.js, so the App Router's static prerendering and the `next/image`
+optimizer work with no configuration. Re-implementing that as a GitHub Actions
+deploy step would mean giving up the image optimizer for a static export, and the
+brief does not weigh the choice of provider.
 
 ---
 
