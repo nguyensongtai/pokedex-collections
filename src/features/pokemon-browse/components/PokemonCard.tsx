@@ -33,6 +33,9 @@ export function PokemonCard({ pokemon, index }: PokemonCardProps) {
             alt={`${displayName} official artwork`}
             fill
             sizes="(max-width: 640px) 45vw, (max-width: 1200px) 25vw, 220px"
+            // The first row is above the fold on every viewport — loading it
+            // eagerly is what Next's LCP hint asks for.
+            priority={index < 4}
             className={styles.image}
           />
         ) : (

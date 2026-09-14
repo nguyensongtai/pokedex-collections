@@ -1,7 +1,7 @@
 .grid {
   display: grid;
-  /* Fluid from 375px to 1920px without a single hard-coded breakpoint. */
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
+  /* Fluid from 375px to 1920px: auto-fill decides the column count. */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
   gap: 1rem;
   margin: 0;
   padding: 0;
@@ -10,6 +10,13 @@
 
 .grid > li {
   display: flex;
+}
+
+/* Two columns still fit at 375px; the wider track takes over from 600px up. */
+@media (min-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
+  }
 }
 
 .skeleton {

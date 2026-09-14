@@ -39,9 +39,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <div className={styles.shell}>
           <nav className={styles.nav} aria-label="Primary">
-            <Link className={styles.brand} href="/">
+            <Link className={styles.brand} href="/" aria-label="PokéDex Collections, home">
               <span className={styles.mark} aria-hidden="true" />
-              PokéDex Collections
+              {/* Hidden below 480px so the nav never wraps; the link keeps its
+                  aria-label, so the accessible name is unaffected. */}
+              <span className={styles.brandText}>PokéDex Collections</span>
             </Link>
 
             <div className={styles.links}>

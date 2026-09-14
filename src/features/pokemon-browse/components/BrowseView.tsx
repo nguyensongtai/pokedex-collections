@@ -30,7 +30,7 @@ export function BrowseView() {
       <SearchBar
         value={query}
         onChange={setQuery}
-        resultCount={status === 'error' ? null : totalMatches}
+        resultCount={status === 'ready' ? totalMatches : null}
         isBusy={status === 'loading' || isLoadingMore}
       />
 

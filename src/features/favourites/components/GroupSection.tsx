@@ -95,9 +95,9 @@ export function GroupSection({ section, groups }: GroupSectionProps) {
 
       {entries.length > 0 ? (
         <ul className={styles.grid}>
-          {entries.map((entry) => (
+          {entries.map((entry, index) => (
             <li key={entry.id}>
-              <FavouriteCard entry={entry} groups={groups} />
+              <FavouriteCard entry={entry} groups={groups} index={index} />
             </li>
           ))}
         </ul>

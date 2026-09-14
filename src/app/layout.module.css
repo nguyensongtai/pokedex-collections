@@ -38,6 +38,16 @@
   color: var(--accent-strong);
 }
 
+.brandText {
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .brandText {
+    display: none;
+  }
+}
+
 .mark {
   display: inline-block;
   width: 0.9rem;

@@ -11,15 +11,17 @@ interface FavouriteCardProps {
   entry: FavouriteEntry;
   /** User-created groups, for the move target list. */
   groups: FavouriteGroup[];
+  /** Position within its group, used for the staggered fade-in and LCP hint. */
+  index: number;
 }
 
-export function FavouriteCard({ entry, groups }: FavouriteCardProps) {
+export function FavouriteCard({ entry, groups, index }: FavouriteCardProps) {
   const moveToGroup = useFavouritesStore((state) => state.moveToGroup);
   const displayName = formatPokemonName(entry.name);
   const selectId = `move-${entry.id}`;
 
   return (
-    <Card interactive className={styles.card}>
+    <Card interactive className={styles.card} style={{ animationDelay: `${Math.min(index, 11) * 25}ms` }}>
       <div className={styles.media}>
         {entry.spriteUrl ? (
           <Image
@@ -27,6 +29,7 @@ export function FavouriteCard({ entry, groups }: FavouriteCardProps) {
             alt=""
             fill
             sizes="(max-width: 640px) 40vw, 180px"
+            priority={index < 4}
             className={styles.image}
           />
         ) : (

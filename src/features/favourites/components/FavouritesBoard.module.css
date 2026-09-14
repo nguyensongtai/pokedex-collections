@@ -18,7 +18,7 @@
 
 .loadingGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 165px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
   gap: 0.9rem;
 }
 
@@ -49,4 +49,10 @@
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
+}
+
+@media (min-width: 600px) {
+  .loadingGrid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 175px), 1fr));
+  }
 }
