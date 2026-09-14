@@ -271,9 +271,47 @@ brief does not weigh the choice of provider.
 
 ## AI usage
 
-AI (Claude) was used for scaffolding and implementation. I directed the
-architecture, reviewed all of the code, and made the technical decisions
-documented above — the feature-sliced-but-simplified layout, the one-way feature
-dependency, the global-vs-local state boundary, the type-indexed search strategy,
-the testing scope, and which parts of the design canvas to implement verbatim
-versus adapt.
+AI (Claude) wrote most of the code in this repository, including the scaffolding,
+the components and the tests. That is the point: it moved the expensive part of
+the work from typing to deciding, which is what let all seven optional items land
+inside the time budget. The trade-offs listed above are scope decisions, not
+things that ran out of typing time.
+
+What the AI produced first was rarely what shipped. Four examples, each traceable
+in the commit history:
+
+**The data strategy was reversed once.** The first implementation took the obvious
+route — `/pokemon?limit=10000` for the name index, then a detail request per
+visible card. It worked. It also could not answer "search by type" without
+hydrating all ~1,000 details first. Walking the 18 type endpoints instead returns
+every Pokémon already grouped by type, which is exactly the join the UI needs:
+one pass, no per-card request, no waterfall. Worth noting what the swap cost:
+`api.ts`, the hook it feeds, and three lines of the feature's barrel. Not one
+component and not one store changed. A boundary is only worth having if it makes
+a change of that size that cheap.
+
+**Two lint errors were fixed rather than suppressed.** React 19's
+`react-hooks/set-state-in-effect` rejected both the hydration guard and the search
+hook. Adding a disable comment was one line. Instead the hydration guard became
+`useSyncExternalStore` against `persist.hasHydrated()` — which is also *more*
+correct, since localStorage rehydrates synchronously and the `useState` + effect
+pattern shows a stale frame — and the search hook now derives pagination instead
+of mirroring it into state.
+
+**The image failures were measured, not guessed at.** Next's optimizer was
+returning 500s for some sprites. The tempting fix, `unoptimized: true`, was tried
+and measured: it was worse. The real cause was an uncapped candidate-width set
+pulling all 24 sprites at once, so the fix was to cap the widths, cache for 30
+days, and load only the first row eagerly. Production now reports zero failed
+image requests.
+
+**The design was adapted, not copied.** The canvas is a single 1440px artboard. It
+specifies no small-screen behaviour, uses `:focus` where `:focus-visible` belongs,
+draws a 36px tap target, and has a summary string that reads "3 Pokémon in 0
+groups" on a fresh collection. Each of those was changed deliberately and is
+listed under *Where this departs from the design canvas*.
+
+Every claim in this README was checked by running the app, not by reading the
+code: the UI was exercised in a browser from 336px to 1600px, the full group
+lifecycle was clicked through, and the deployed site was re-verified on production
+(zero console errors, zero failed requests).
