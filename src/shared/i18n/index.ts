@@ -1,4 +1,5 @@
 /** Public API of the i18n layer. */
+export { HtmlLang } from './HtmlLang';
 export { LanguageToggle } from './LanguageToggle';
 export {
   DEFAULT_LANGUAGE,

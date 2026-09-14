@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Be_Vietnam_Pro } from 'next/font/google';
 import type { ReactNode } from 'react';
+import { DEFAULT_LANGUAGE, HtmlLang } from '@/shared/i18n';
 import { Nav } from './Nav';
 import styles from './layout.module.css';
 import './globals.css';
@@ -30,8 +31,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={sans.variable}>
+    // `lang` starts at the default language and `HtmlLang` corrects it on the
+    // client, so the server and first client render still agree.
+    <html lang={DEFAULT_LANGUAGE} className={sans.variable}>
       <body>
+        {/* Corrects <html lang> once the stored language rehydrates. */}
+        <HtmlLang />
         <div className={styles.shell}>
           <Nav />
           <main className={styles.main}>{children}</main>

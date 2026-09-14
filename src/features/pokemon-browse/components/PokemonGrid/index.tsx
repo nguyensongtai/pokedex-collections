@@ -82,7 +82,11 @@ export function PokemonGrid({
   }
 
   return (
-    <>
+    <section aria-labelledby="results-heading">
+      <h2 className={styles.srOnly} id="results-heading">
+        {t.results}
+      </h2>
+
       <ul className={styles.grid}>
         {results.map((pokemon, index) => (
           <li key={pokemon.id}>
@@ -98,6 +102,6 @@ export function PokemonGrid({
           </Button>
         </div>
       ) : null}
-    </>
+    </section>
   );
 }

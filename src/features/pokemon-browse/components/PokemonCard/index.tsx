@@ -22,11 +22,15 @@ interface PokemonCardProps {
 /** Pure presentation: everything it renders arrives as props. */
 export function PokemonCard({ pokemon, index }: PokemonCardProps) {
   const displayName = formatPokemonName(pokemon.name);
+  const nameId = `pokemon-${pokemon.id}-name`;
 
   return (
     <Card
       as="article"
       interactive
+      // The grid is a list of results, not 48 document sections, so the card
+      // takes its accessible name from the name element instead of a heading.
+      aria-labelledby={nameId}
       className={styles.card}
       style={{ animationDelay: `${Math.min(index, 11) * 25}ms` }}
     >
@@ -42,7 +46,9 @@ export function PokemonCard({ pokemon, index }: PokemonCardProps) {
       </div>
 
       <div className={styles.heading}>
-        <h2 className={styles.name}>{displayName}</h2>
+        <p className={styles.name} id={nameId}>
+          {displayName}
+        </p>
         <span className={styles.number}>{formatDexNumber(pokemon.id)}</span>
       </div>
 

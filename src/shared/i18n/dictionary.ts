@@ -24,6 +24,7 @@ export interface Dictionary {
   language: string;
   home: string;
 
+  results: string;
   searchPlaceholder: string;
   clear: string;
   loading: string;
@@ -68,6 +69,7 @@ export const DICTIONARIES: Record<Language, Dictionary> = {
     language: 'Language',
     home: 'PokéDex Collections, home',
 
+    results: 'Results',
     searchPlaceholder: 'Search by name, number or type…',
     clear: 'Clear search',
     loading: 'Loading the PokéDex…',
@@ -113,6 +115,7 @@ export const DICTIONARIES: Record<Language, Dictionary> = {
     language: 'Ngôn ngữ',
     home: 'PokéDex Collections, trang chủ',
 
+    results: 'Kết quả',
     searchPlaceholder: 'Tìm theo tên, số hoặc hệ…',
     clear: 'Xoá tìm kiếm',
     loading: 'Đang tải PokéDex…',

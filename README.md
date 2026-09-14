@@ -243,6 +243,25 @@ language ("Add Pikachu to favourites" / "Thêm Pikachu vào yêu thích"); the s
 input, the language switcher and every group control are labelled; focus-visible
 rings are global; and the whole app is keyboard-operable.
 
+`<html lang>` follows the language switcher. It is not decoration: assistive
+technology picks its voice and pronunciation rules from it, so Vietnamese copy
+under `lang="en"` gets read with English phonetics.
+
+**Headings describe the document, not every card.** The browse grid is a list of
+results, so its 48 cards are not 48 document sections: each `<article>` takes its
+accessible name from its name element via `aria-labelledby`, and the grid sits in
+one labelled region. The outline is `h1 Browse → h2 Results` — two headings, not
+forty-nine — while screen-reader users still navigate card to card through the
+list. The favourites page is the opposite case: its groups *are* real sections, so
+each one keeps an `h2`. Depth follows structure, so no `h3` is invented for it.
+
+Images carry `alt`, not `title` — descriptive on the browse cards, empty on the
+favourites rows where the name sits right beside the image and a repeat would just
+be noise. `title` is deliberately not used as an accessibility mechanism anywhere:
+it never appears on touch, never on keyboard focus, and is inconsistently exposed
+by screen readers. Links get their names from their text, or from `aria-label`
+where the label is icon-only.
+
 Animations are pure CSS — card and row hover lift, the springy heart pop, the
 skeleton shimmer, staggered grid fade-in — all 150–250 ms, and a single global
 `prefers-reduced-motion` block turns them off. The heart's pop is scoped to the
