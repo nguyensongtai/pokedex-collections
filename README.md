@@ -1,10 +1,14 @@
 # PokéDex Collections
 
 A two-page Pokémon fan site: browse the full National Pokédex with search-as-you-type,
-and organise your favourites into custom groups that survive a reload.
+and organise your favourites into custom groups that survive a reload. English and
+Vietnamese.
 
 Built with Next.js 16 (App Router), TypeScript in strict mode, Zustand + `persist`,
 CSS Modules, and Vitest.
+
+The UI implements the `PokeDex Collections.dc.html` design canvas — its palette,
+type scale, card and row layouts, empty/error/loading states, and its EN/VI copy.
 
 ---
 
@@ -39,6 +43,8 @@ src/
 │   ├── page.tsx              # Browse route
 │   ├── loading.tsx           # route-level loading UI
 │   ├── error.tsx             # route-level error boundary
+│   ├── Nav.tsx               # one client boundary for the shell's nav
+│   ├── RouteError.tsx        # shared behaviour for both error boundaries
 │   └── favourites/{page,error}.tsx
 │
 ├── features/
@@ -46,17 +52,19 @@ src/
 │   │   ├── components/       # SearchBar, PokemonGrid, PokemonCard, TypeBadge, BrowseView
 │   │   ├── hooks/usePokemonSearch.ts   # index + filtering + pagination, no JSX
 │   │   ├── api.ts            # every PokeAPI call, fully typed, no JSX
+│   │   ├── api.test.ts       # search matching rules
 │   │   └── index.ts          # public API
 │   │
 │   └── favourites/           # favourite & group management
-│       ├── components/       # FavouriteButton, GroupManager, GroupSection, FavouriteCard,
+│       ├── components/       # FavouriteButton, GroupSection, FavouriteRow,
 │       │                     # FavouritesBoard, FavouritesCounter
 │       ├── store.ts          # Zustand + persist — state lives with its owning feature
 │       ├── store.test.ts     # tests colocated with the store
 │       └── index.ts          # public API
 │
 └── shared/
-    ├── ui/                   # Button, Card, Badge, Skeleton, Spinner, EmptyState, NavLink
+    ├── ui/                   # Artwork, Badge, Button, Card, ErrorState, NavLink, Skeleton
+    ├── i18n/                 # dictionary, language store, LanguageToggle (+ store.test.ts)
     ├── types/                # Pokémon domain types + canonical type colours
     └── lib/                  # cn, useDebouncedValue
 ```
@@ -85,18 +93,28 @@ both features render them. Rather than let `favourites` import `pokemon-browse`,
 palette lives in `shared/types/pokemon.ts` (domain data, no UI), and
 `pokemon-browse/TypeBadge` is the thin Pokémon-aware wrapper.
 
+**Every `shared/ui` export has at least two consumers.** Implementing the design
+changed which shapes are genuinely shared: `Card`, `Skeleton` and a new
+`ErrorState` each back two or more callers, so `Spinner` and `EmptyState` were
+removed rather than left as a kit that looks fuller than it is. A primitive with a
+single caller belongs next to that caller.
+
 **State ownership is self-documenting.** The Zustand store lives inside
 `features/favourites` rather than in a top-level `store/`, which makes the
 global-vs-local boundary obvious from the file tree:
 
-- **Global** — favourites and groups. They cross routes, feed the nav counter and
-  must survive reloads.
-- **Local** — the search query, fetched results and pagination, owned by
-  `usePokemonSearch`. Nothing outside the browse page reads them, and a persisted
-  search box would be surprising.
+- **Global** — favourites and groups (`features/favourites/store.ts`), plus the
+  selected language (`shared/i18n/store.ts`). Both cross routes and must survive
+  reloads.
+- **Local** — the search query, loaded Pokédex and pagination, owned by
+  `usePokemonSearch`; rename drafts, per-image load state, the heart's pop. Nothing
+  outside their component reads them, and a persisted search box would be
+  surprising.
 
-Both halves are documented in comments at the top of `store.ts` and
-`usePokemonSearch.ts`.
+The language store sits in `shared/i18n` rather than in a feature precisely
+*because* no feature owns it: the nav and both pages read it. Those two stores are
+the complete set of global state. Both boundaries are documented in comments at the
+top of `store.ts` and `usePokemonSearch.ts`.
 
 **Zustand + `persist`** covers state management *and* the persistence requirement
 in one pattern, with no hand-rolled localStorage effects. Hydration uses
@@ -116,19 +134,29 @@ fetching and maps wire formats onto a small `PokemonSummary`; `usePokemonSearch`
 owns the orchestration; `PokemonGrid` and `PokemonCard` only render props.
 
 **API choice: PokeAPI**, for zero-auth setup inside the time budget. Its lack of a
-search endpoint turned into the most interesting architectural constraint:
+search endpoint turned into the most interesting architectural constraint, and the
+design settled how to answer it.
 
-1. Fetch the full name index once (`?limit=10000`, names + URLs only), cached in
-   module scope in `api.ts` and evicted on failure so retry genuinely re-requests.
-2. Filter it client-side on a 200 ms debounce, exact and prefix matches first.
-3. Hydrate details (`official-artwork` sprite + types) lazily for the visible page
-   only — 24 cards, extended by a "Load more" button. Details are memoised per
-   name, so paging is additive and re-searching a previous term is free.
-4. Everything is typed end to end; there is no `any` in the codebase.
+The obvious route — `/pokemon?limit=10000` — returns names and URLs only. No types.
+That forces one detail request per visible card, and makes the design's
+*search by type* impossible without fetching all ~1,000 of them anyway.
 
-Individual detail failures are tolerated (PokeAPI has a few flaky form entries) and
-recorded so the grid does not retry them forever; the error state appears only when
-a whole batch fails.
+Walking the **18 type endpoints** inverts the problem: 18 parallel requests return
+every Pokémon already grouped by type, which is exactly the join the UI needs.
+
+1. One pass builds the full `id → {name, types}` index, cached in module scope in
+   `api.ts` and evicted on failure so retry genuinely re-requests.
+2. Artwork URLs are derived from the id, so no request is ever made to discover a
+   sprite.
+3. Filtering by name, dex number or type is then pure client-side work on a 200 ms
+   debounce (`filterPokedex`, unit-tested).
+4. Pagination is 48 cards at a time behind a "Show more · N left" button, and it is
+   purely a slice — no fetch, no waterfall, nothing to re-request.
+5. Everything is typed end to end; there is no `any` in the codebase.
+
+The cost is a heavier first load in exchange for no request waterfall, instant
+pagination, and type search. Alternate forms (ids above 10000 — megas, regionals)
+are filtered out, which is why the count reads ~1,025 rather than ~1,300.
 
 **Three handled states, everywhere.** Every data view renders exactly one of
 loading (skeleton grid), error (message + retry button) or empty (e.g. *No Pokémon
@@ -138,13 +166,14 @@ match "xyz"*). There are no blank screens and no unhandled promise rejections.
 
 ## Trade-offs made for the ~2-hour budget
 
-- **"Load more" pagination instead of virtualisation.** 1,351 index entries filter
-  fine client-side, but the DOM grows as you page; a virtualised grid would be the
+- **"Show more" pagination instead of virtualisation.** ~1,025 entries filter fine
+  client-side, but the DOM grows as you page; a virtualised grid would be the
   correct answer at ten times the size.
-- **Unit tests scoped to the store.** That is where the business rules live —
-  dedupe, the virtual Ungrouped group, and the guarantee that deleting a group
-  never deletes its Pokémon. Component and E2E tests would be the next step, not a
-  replacement.
+- **Unit tests scoped to pure logic.** 22 cases over the favourites store (dedupe,
+  the virtual Ungrouped group, the guarantee that deleting a group never deletes its
+  Pokémon), the language store and dictionary parity, and the search matcher — the
+  three places business rules actually live. Component and E2E tests would be the
+  next step, not a replacement.
 - **No Pokémon detail page.** Cards carry artwork, number, name and types; stats,
   abilities and evolution chains were out of scope.
 - **No request cancellation on the wire.** In-flight fetches are ignored rather
@@ -160,6 +189,8 @@ match "xyz"*). There are no blank screens and no unhandled promise rejections.
 ## With more time
 
 - A Pokémon detail route (`/pokemon/[name]`), server-rendered from the same `api.ts`.
+- Locale-routed i18n (`/[lang]/...`) with `next-intl`, so language is shareable in a
+  URL and translated copy is server-rendered rather than swapped on the client.
 - Drag-and-drop group reordering, replacing the per-card `<select>`.
 - React Query for request caching, deduplication and retry, replacing the hand-rolled
   module-scope caches.
@@ -169,17 +200,37 @@ match "xyz"*). There are no blank screens and no unhandled promise rejections.
 
 ---
 
+## Where this departs from the design canvas
+
+The canvas is a single 1440px artboard rendered by the Design Canvas runtime. Four
+deliberate differences:
+
+- **Responsive behaviour is ours.** The canvas specifies none. Grids use
+  `auto-fill minmax()` from 375px to 1920px, the shell gutter tightens at 720px and
+  480px, the nav wordmark collapses to the Poké Ball mark (the link keeps its
+  `aria-label`), and favourite rows stack their controls below 480px.
+- **Tap targets.** The canvas draws a 36px heart. The visual is unchanged, but a
+  transparent `::before` expands the *hit area* to 44×44 to clear the touch
+  guideline.
+- **`:focus-visible`, not `:focus`.** The canvas' `style-focus` compiles to
+  `:focus`, which lights the ring on mouse clicks too. Keyboard paths keep the ring;
+  pointer paths don't.
+- **"0 groups".** The canvas' summary string always names a group count, so a fresh
+  collection reads "3 Pokémon in 0 groups". With no groups yet it falls back to the
+  plain count.
+
 ## Accessibility & motion
 
 Semantic `nav` / `main` / `section` / real `button` elements throughout. Favourite
-toggles are `aria-pressed` with names that include the Pokémon ("Add Pikachu to
-favourites"), the search input and every group control is labelled, focus-visible
-rings are global, and the whole app is keyboard-operable. Favourite buttons are a
-44×44 tap target and are always visible — never revealed on hover.
+toggles are `aria-pressed` with names that include the Pokémon, in the active
+language ("Add Pikachu to favourites" / "Thêm Pikachu vào yêu thích"); the search
+input, the language switcher and every group control are labelled; focus-visible
+rings are global; and the whole app is keyboard-operable.
 
-Animations are pure CSS (card hover lift, springy heart pop, staggered grid
-fade-in), all 150–240 ms, and a single global `prefers-reduced-motion` block turns
-them off.
+Animations are pure CSS — card and row hover lift, the springy heart pop, the
+skeleton shimmer, staggered grid fade-in — all 150–250 ms, and a single global
+`prefers-reduced-motion` block turns them off. The heart's pop is scoped to the
+click that turns it on, so a page of saved favourites doesn't pop on load.
 
 ---
 
@@ -195,5 +246,6 @@ install → lint → typecheck → test → build.
 AI (Claude) was used for scaffolding and implementation. I directed the
 architecture, reviewed all of the code, and made the technical decisions
 documented above — the feature-sliced-but-simplified layout, the one-way feature
-dependency, the global-vs-local state boundary, the indexed-search data strategy,
-and the testing scope.
+dependency, the global-vs-local state boundary, the type-indexed search strategy,
+the testing scope, and which parts of the design canvas to implement verbatim
+versus adapt.
