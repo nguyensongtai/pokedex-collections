@@ -60,6 +60,21 @@ export interface Dictionary {
 
   addFav: (name: string) => string;
   rmFav: (name: string) => string;
+
+  // Detail route
+  back: string;
+  previous: string;
+  next: string;
+  height: string;
+  weight: string;
+  baseExp: string;
+  abilities: string;
+  hidden: string;
+  stats: string;
+  total: string;
+  detailErr: string;
+  notFound: string;
+  notFoundHint: string;
 }
 
 export const DICTIONARIES: Record<Language, Dictionary> = {
@@ -107,6 +122,20 @@ export const DICTIONARIES: Record<Language, Dictionary> = {
 
     addFav: (name) => `Add ${name} to favourites`,
     rmFav: (name) => `Remove ${name} from favourites`,
+
+    back: 'Back',
+    previous: 'Previous Pokémon',
+    next: 'Next Pokémon',
+    height: 'Height',
+    weight: 'Weight',
+    baseExp: 'Base EXP',
+    abilities: 'Abilities',
+    hidden: 'Hidden',
+    stats: 'Base stats',
+    total: 'Total',
+    detailErr: 'Couldn’t load details.',
+    notFound: 'No such Pokémon',
+    notFoundHint: 'That number is not in the Pokédex.',
   },
 
   vi: {
@@ -153,6 +182,20 @@ export const DICTIONARIES: Record<Language, Dictionary> = {
 
     addFav: (name) => `Thêm ${name} vào yêu thích`,
     rmFav: (name) => `Bỏ ${name} khỏi yêu thích`,
+
+    back: 'Quay lại',
+    previous: 'Pokémon trước',
+    next: 'Pokémon sau',
+    height: 'Chiều cao',
+    weight: 'Cân nặng',
+    baseExp: 'EXP cơ bản',
+    abilities: 'Kỹ năng',
+    hidden: 'Ẩn',
+    stats: 'Chỉ số cơ bản',
+    total: 'Tổng',
+    detailErr: 'Không tải được chi tiết.',
+    notFound: 'Không có Pokémon này',
+    notFoundHint: 'Số này không có trong Pokédex.',
   },
 };
 

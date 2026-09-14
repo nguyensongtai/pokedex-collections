@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { UNGROUPED_ID, useFavouritesStore, type FavouriteEntry, type FavouriteGroup } from '../../store';
 import { useTranslation } from '@/shared/i18n';
 import { Artwork, Badge, Card } from '@/shared/ui';
@@ -40,14 +41,9 @@ export function FavouriteRow({ entry, groups, index }: FavouriteRowProps) {
       className={styles.row}
       style={{ animationDelay: `${Math.min(index, 11) * 25}ms` }}
     >
-      <div className={styles.media}>
-        <Artwork
-          src={entry.spriteUrl}
-          alt=""
-          sizes="64px"
-          priority={index < 4}
-        />
-      </div>
+      <Link className={styles.media} href={`/pokemon/${entry.id}`} aria-label={displayName}>
+        <Artwork src={entry.spriteUrl} alt="" sizes="64px" priority={index < 4} />
+      </Link>
 
       <div className={styles.identity}>
         <div className={styles.heading}>

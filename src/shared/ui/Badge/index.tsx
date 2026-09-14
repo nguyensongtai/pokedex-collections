@@ -5,7 +5,7 @@ import styles from './index.module.css';
 interface BadgeProps {
   /** Any CSS colour. The badge derives tint, text and border from it. */
   color?: string;
-  size?: 'sm' | 'md';
+  size?: 'sm' | 'md' | 'lg';
   className?: string;
   children: ReactNode;
 }

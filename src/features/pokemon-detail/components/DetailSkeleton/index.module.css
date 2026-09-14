@@ -1,0 +1,68 @@
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.back {
+  width: 92px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+}
+
+.steps {
+  width: 76px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 28px;
+  align-items: start;
+}
+
+.figure {
+  aspect-ratio: 1;
+  border-radius: 20px;
+}
+
+.number {
+  width: 64px;
+  height: 14px;
+  border-radius: 999px;
+}
+
+.name {
+  width: min(280px, 70%);
+  height: 44px;
+  margin-top: 10px;
+  border-radius: var(--radius-sm);
+}
+
+.genus {
+  width: min(180px, 50%);
+  height: 15px;
+  margin-top: 12px;
+  border-radius: 999px;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.tile {
+  height: 66px;
+  border-radius: 12px;
+}
+
+.block {
+  height: 190px;
+  margin-top: 24px;
+  border-radius: 12px;
+}

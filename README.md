@@ -50,7 +50,8 @@ src/
 │   ├── error.tsx             # route-level error boundary
 │   ├── Nav/                  # one client boundary for the shell's nav
 │   ├── RouteError/           # shared behaviour for both error boundaries
-│   └── favourites/{page,error}.tsx
+│   ├── favourites/{page,error}.tsx
+│   └── pokemon/[id]/         # detail route: page, loading, error, not-found
 │
 ├── features/
 │   ├── pokemon-browse/       # search & browse
@@ -59,6 +60,12 @@ src/
 │   │   ├── hooks/usePokemonSearch.ts   # index + filtering + pagination, no JSX
 │   │   ├── api.ts            # every PokeAPI call, fully typed, no JSX
 │   │   ├── api.test.ts       # search matching rules
+│   │   └── index.ts          # public API
+│   │
+│   ├── pokemon-detail/       # one Pokémon: stats, abilities, Pokédex entry
+│   │   ├── components/       # PokemonDetailView/, DetailNav/, StatBars/,
+│   │   │                     # DetailSkeleton/, NotFoundState/
+│   │   ├── api.ts            # server-side PokeAPI calls, fully typed, no JSX
 │   │   └── index.ts          # public API
 │   │
 │   └── favourites/           # favourite & group management
@@ -139,6 +146,20 @@ always `false` and React reuses it for the hydration pass, so store-dependent UI
 can never produce a mismatch. Rehydration from localStorage is synchronous, so
 the usual `useState(false)` + effect flip would render a frame late.
 
+**The detail route fetches on the server.** `/pokemon/[id]` is the one route whose
+data is not client state, so it is a real server component: `page.tsx` awaits
+PokeAPI during the render, `generateMetadata` gives every Pokémon its own document
+title and description, an unknown id becomes `notFound()` rather than an error,
+and the two requests it needs run in parallel. Responses are revalidated monthly —
+entity data that has not changed since 1996 does not need refetching per request.
+The view below it is a client component only because the copy is translated in the
+browser; every byte it renders arrives as props.
+
+Adding it meant adding `features/pokemon-detail/` — a folder, its own `api.ts`, its
+own public API. No existing feature changed shape to accommodate it, which is the
+claim the feature-based layout makes and the first chance the project had to test
+it.
+
 **App Router conventions instead of hand-rolled equivalents** — `loading.tsx` for
 route loading, `error.tsx` for route error boundaries (with `reset()` as retry),
 the metadata API for titles, and `next/font` for self-hosted fonts with no layout
@@ -190,8 +211,9 @@ match "xyz"*). There are no blank screens and no unhandled promise rejections.
   Pokémon), the language store and dictionary parity, and the search matcher — the
   three places business rules actually live. Component and E2E tests would be the
   next step, not a replacement.
-- **No Pokémon detail page.** Cards carry artwork, number, name and types; stats,
-  abilities and evolution chains were out of scope.
+- **No evolution chains on the detail page.** It covers artwork, types, the Pokédex
+  entry, height/weight/base EXP, abilities and base stats. Evolution needs a third
+  endpoint and a tree renderer, which was more than the remaining budget.
 - **No request cancellation on the wire.** In-flight fetches are ignored rather
   than aborted; with `AbortController` threaded through `api.ts` this would be a
   small change.
@@ -204,7 +226,9 @@ match "xyz"*). There are no blank screens and no unhandled promise rejections.
 
 ## With more time
 
-- A Pokémon detail route (`/pokemon/[name]`), server-rendered from the same `api.ts`.
+- Evolution chains and move lists on the detail route.
+- `generateStaticParams` for the first generation, so the most-visited detail pages
+  are prerendered instead of rendered on demand.
 - Locale-routed i18n (`/[lang]/...`) with `next-intl`, so language is shareable in a
   URL and translated copy is server-rendered rather than swapped on the client.
 - Drag-and-drop group reordering, replacing the per-card `<select>`.
@@ -234,6 +258,14 @@ deliberate differences:
 - **"0 groups".** The canvas' summary string always names a group count, so a fresh
   collection reads "3 Pokémon in 0 groups". With no groups yet it falls back to the
   plain count.
+- **Navigation is links, not click handlers.** The canvas models the detail screen
+  as a `page` state: cards are `role="button"` divs, and Back returns to whichever
+  screen you came from. With a real route per Pokémon those become `<a>` elements,
+  so middle-click, right-click, "open in new tab" and the browser's own back button
+  all work. Cards use the stretched-link pattern — the anchor wraps the name and
+  covers the card via `::after` — because nesting the favourite button inside an
+  `<a>` would be invalid HTML and would swallow its click. Back is a link to Browse
+  rather than "the previous screen", since the browser already owns that job.
 
 ## Accessibility & motion
 

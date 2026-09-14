@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { TypeBadge } from '../TypeBadge';
 // ── Deliberate one-way feature dependency ───────────────────────────────────
 // `pokemon-browse` -> `favourites` (public API only). The reverse import is
@@ -47,7 +48,12 @@ export function PokemonCard({ pokemon, index }: PokemonCardProps) {
 
       <div className={styles.heading}>
         <p className={styles.name} id={nameId}>
-          {displayName}
+          {/* Stretched link: the anchor covers the whole card via ::after, so
+              the card is clickable without nesting the favourite button inside
+              an <a> — which would be invalid, and would swallow its click. */}
+          <Link className={styles.link} href={`/pokemon/${pokemon.id}`}>
+            {displayName}
+          </Link>
         </p>
         <span className={styles.number}>{formatDexNumber(pokemon.id)}</span>
       </div>

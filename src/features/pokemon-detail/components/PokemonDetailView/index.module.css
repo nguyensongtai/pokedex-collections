@@ -1,0 +1,161 @@
+.layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 28px;
+  align-items: start;
+}
+
+/* ── Artwork panel ────────────────────────────────────────────────────────── */
+
+.figure {
+  position: relative;
+  overflow: hidden;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+/* A wash of the primary type's colour, so the page picks up the Pokémon's
+   character without tinting the chrome. */
+.glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 45%, var(--glow) 0%, transparent 60%);
+  opacity: 0.5;
+}
+
+.favourite {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+}
+
+.media {
+  position: relative;
+  aspect-ratio: 1;
+  filter: drop-shadow(0 18px 24px rgb(17 17 22 / 14%));
+}
+
+/* ── Information column ───────────────────────────────────────────────────── */
+
+.info {
+  min-width: 0;
+}
+
+.number {
+  margin: 0;
+  color: var(--text-subtle);
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.name {
+  margin: 4px 0 0;
+  font-size: clamp(32px, 5vw, 44px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+
+.genus {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.flavor {
+  margin: 20px 0 0;
+  color: #3a3a40;
+  font-size: 15px;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+/* ── Tiles ────────────────────────────────────────────────────────────────── */
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 24px 0 0;
+}
+
+.tile {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.tileLabel {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.tileValue {
+  margin: 2px 0 0;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Abilities ────────────────────────────────────────────────────────────── */
+
+.abilities {
+  margin-top: 24px;
+}
+
+.sectionHeading {
+  margin: 0;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.abilityList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ability,
+.abilityHidden {
+  padding: 6px 12px;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.ability {
+  color: var(--text);
+}
+
+.abilityHidden {
+  color: var(--text-muted);
+}
