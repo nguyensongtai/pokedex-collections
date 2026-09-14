@@ -1,6 +1,6 @@
 'use client';
 
-import { UNGROUPED_ID, useFavouritesStore, type FavouriteEntry, type FavouriteGroup } from '../store';
+import { UNGROUPED_ID, useFavouritesStore, type FavouriteEntry, type FavouriteGroup } from '../../store';
 import { useTranslation } from '@/shared/i18n';
 import { Artwork, Badge, Card } from '@/shared/ui';
 import {
@@ -8,7 +8,7 @@ import {
   formatPokemonName,
   typeColor,
 } from '@/shared/types/pokemon';
-import styles from './FavouriteRow.module.css';
+import styles from './index.module.css';
 
 interface FavouriteRowProps {
   entry: FavouriteEntry;

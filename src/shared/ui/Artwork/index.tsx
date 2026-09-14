@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { cn } from '@/shared/lib';
-import styles from './Artwork.module.css';
+import styles from './index.module.css';
 
 interface ArtworkProps {
   src: string;

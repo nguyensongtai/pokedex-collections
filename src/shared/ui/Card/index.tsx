@@ -1,6 +1,6 @@
 import type { HTMLAttributes } from 'react';
 import { cn } from '@/shared/lib';
-import styles from './Card.module.css';
+import styles from './index.module.css';
 
 interface CardProps extends HTMLAttributes<HTMLElement> {
   /** Adds the hover-lift affordance. Off for static containers. */

@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslation } from '@/shared/i18n';
-import styles from './SearchBar.module.css';
+import styles from './index.module.css';
 
 interface SearchBarProps {
   value: string;

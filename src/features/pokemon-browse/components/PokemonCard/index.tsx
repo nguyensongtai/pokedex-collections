@@ -1,4 +1,4 @@
-import { TypeBadge } from './TypeBadge';
+import { TypeBadge } from '../TypeBadge';
 // ── Deliberate one-way feature dependency ───────────────────────────────────
 // `pokemon-browse` -> `favourites` (public API only). The reverse import is
 // forbidden: the favourites feature must stay usable without the browse
@@ -11,7 +11,7 @@ import {
   formatPokemonName,
   type PokemonSummary,
 } from '@/shared/types/pokemon';
-import styles from './PokemonCard.module.css';
+import styles from './index.module.css';
 
 interface PokemonCardProps {
   pokemon: PokemonSummary;

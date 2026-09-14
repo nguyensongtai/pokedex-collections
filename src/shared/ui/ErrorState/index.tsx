@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/shared/lib';
-import styles from './ErrorState.module.css';
+import styles from './index.module.css';
 
 interface ErrorStateProps {
   title: string;

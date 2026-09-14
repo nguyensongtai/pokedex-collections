@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { cn } from '@/shared/lib';
-import styles from './Badge.module.css';
+import styles from './index.module.css';
 
 interface BadgeProps {
   /** Any CSS colour. The badge derives tint, text and border from it. */

@@ -43,31 +43,42 @@ src/
 │   ├── page.tsx              # Browse route
 │   ├── loading.tsx           # route-level loading UI
 │   ├── error.tsx             # route-level error boundary
-│   ├── Nav.tsx               # one client boundary for the shell's nav
-│   ├── RouteError.tsx        # shared behaviour for both error boundaries
+│   ├── Nav/                  # one client boundary for the shell's nav
+│   ├── RouteError/           # shared behaviour for both error boundaries
 │   └── favourites/{page,error}.tsx
 │
 ├── features/
 │   ├── pokemon-browse/       # search & browse
-│   │   ├── components/       # SearchBar, PokemonGrid, PokemonCard, TypeBadge, BrowseView
+│   │   ├── components/       # SearchBar/, PokemonGrid/, PokemonCard/,
+│   │   │                     # TypeBadge/, BrowseView/
 │   │   ├── hooks/usePokemonSearch.ts   # index + filtering + pagination, no JSX
 │   │   ├── api.ts            # every PokeAPI call, fully typed, no JSX
 │   │   ├── api.test.ts       # search matching rules
 │   │   └── index.ts          # public API
 │   │
 │   └── favourites/           # favourite & group management
-│       ├── components/       # FavouriteButton, GroupSection, FavouriteRow,
-│       │                     # FavouritesBoard, FavouritesCounter
+│       ├── components/       # FavouriteButton/, GroupSection/, FavouriteRow/,
+│       │                     # FavouritesBoard/, FavouritesCounter/
 │       ├── store.ts          # Zustand + persist — state lives with its owning feature
 │       ├── store.test.ts     # tests colocated with the store
 │       └── index.ts          # public API
 │
 └── shared/
-    ├── ui/                   # Artwork, Badge, Button, Card, ErrorState, NavLink, Skeleton
-    ├── i18n/                 # dictionary, language store, LanguageToggle (+ store.test.ts)
+    ├── ui/                   # Artwork/, Badge/, Button/, Card/, ErrorState/,
+    │                         # NavLink/, Skeleton/
+    ├── i18n/                 # dictionary, language store, LanguageToggle/ (+ store.test.ts)
     ├── types/                # Pokémon domain types + canonical type colours
     └── lib/                  # cn, useDebouncedValue
 ```
+
+**One folder per component.** Every component is a directory holding
+`index.tsx` and, where it has styles, `index.module.css` — so a component's
+markup and its stylesheet are never separated by an alphabetised file list, and
+deleting a component means deleting one folder. Import paths are unchanged
+(`@/shared/ui/Badge` resolves to `Badge/index.tsx`), so the barrel files did not
+move. The exceptions are the App Router's own route files (`layout.tsx`,
+`page.tsx`, `loading.tsx`, `error.tsx`): their paths *are* the routing contract,
+so they keep their stylesheets beside them.
 
 ### Decisions
 

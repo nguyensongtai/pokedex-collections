@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useFavouritesHydrated, useFavouritesStore } from '../store';
+import { useFavouritesHydrated, useFavouritesStore } from '../../store';
 import { cn } from '@/shared/lib';
-import styles from './FavouritesCounter.module.css';
+import styles from './index.module.css';
 
 /**
  * Live favourites badge for the nav. Owned by this feature because it reads

@@ -1,11 +1,11 @@
 'use client';
 
-import { PokemonCard } from './PokemonCard';
-import type { SearchStatus } from '../hooks/usePokemonSearch';
+import { PokemonCard } from '../PokemonCard';
+import type { SearchStatus } from '../../hooks/usePokemonSearch';
 import { useTranslation } from '@/shared/i18n';
 import { Button, ErrorState, Skeleton } from '@/shared/ui';
 import type { PokemonSummary } from '@/shared/types/pokemon';
-import styles from './PokemonGrid.module.css';
+import styles from './index.module.css';
 
 interface PokemonGridProps {
   results: PokemonSummary[];

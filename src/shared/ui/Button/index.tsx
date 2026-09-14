@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes } from 'react';
 import { cn } from '@/shared/lib';
-import styles from './Button.module.css';
+import styles from './index.module.css';
 
 type ButtonVariant = 'primary' | 'ink' | 'secondary' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';

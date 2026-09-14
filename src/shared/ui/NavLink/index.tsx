@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { cn } from '@/shared/lib';
-import styles from './NavLink.module.css';
+import styles from './index.module.css';
 
 interface NavLinkProps {
   href: string;

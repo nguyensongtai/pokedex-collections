@@ -6,10 +6,10 @@ import {
   useFavouritesStore,
   type FavouriteGroup,
   type GroupedFavourites,
-} from '../store';
-import { FavouriteRow } from './FavouriteRow';
+} from '../../store';
+import { FavouriteRow } from '../FavouriteRow';
 import { useTranslation } from '@/shared/i18n';
-import styles from './GroupSection.module.css';
+import styles from './index.module.css';
 
 interface GroupSectionProps {
   section: GroupedFavourites;

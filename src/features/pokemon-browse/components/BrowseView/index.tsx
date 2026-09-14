@@ -1,10 +1,10 @@
 'use client';
 
-import { usePokemonSearch } from '../hooks/usePokemonSearch';
-import { PokemonGrid } from './PokemonGrid';
-import { SearchBar } from './SearchBar';
+import { usePokemonSearch } from '../../hooks/usePokemonSearch';
+import { PokemonGrid } from '../PokemonGrid';
+import { SearchBar } from '../SearchBar';
 import { useTranslation } from '@/shared/i18n';
-import styles from './BrowseView.module.css';
+import styles from './index.module.css';
 
 /**
  * Container for the browse route: it runs the feature's hook and wires the

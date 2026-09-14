@@ -1,5 +1,5 @@
 import { cn } from '@/shared/lib';
-import styles from './Skeleton.module.css';
+import styles from './index.module.css';
 
 interface SkeletonProps {
   className?: string;

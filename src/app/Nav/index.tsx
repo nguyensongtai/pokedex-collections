@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { FavouritesCounter } from '@/features/favourites';
 import { LanguageToggle, useTranslation } from '@/shared/i18n';
 import { NavLink } from '@/shared/ui';
-import styles from './layout.module.css';
+import styles from './index.module.css';
 
 /**
  * The app shell's navigation. A single client boundary — it reads the

@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useFavouritesHydrated, useFavouritesStore } from '../store';
+import { useFavouritesHydrated, useFavouritesStore } from '../../store';
 import { useTranslation } from '@/shared/i18n';
 import { cn } from '@/shared/lib';
 import { formatPokemonName, type PokemonSummary } from '@/shared/types/pokemon';
-import styles from './FavouriteButton.module.css';
+import styles from './index.module.css';
 
 interface FavouriteButtonProps {
   pokemon: PokemonSummary;

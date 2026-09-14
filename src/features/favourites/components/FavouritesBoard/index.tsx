@@ -7,11 +7,11 @@ import {
   groupFavourites,
   useFavouritesHydrated,
   useFavouritesStore,
-} from '../store';
-import { GroupSection } from './GroupSection';
+} from '../../store';
+import { GroupSection } from '../GroupSection';
 import { useTranslation } from '@/shared/i18n';
 import { Button, Skeleton } from '@/shared/ui';
-import styles from './FavouritesBoard.module.css';
+import styles from './index.module.css';
 
 /**
  * Container for the favourites route. `app/favourites/page.tsx` stays a server
