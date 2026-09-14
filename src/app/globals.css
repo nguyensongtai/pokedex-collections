@@ -1,44 +1,70 @@
 /* ── Design tokens ─────────────────────────────────────────────────────────
-   Neutral near-white chrome and a single accent; the Pokémon artwork supplies
-   all the colour. Type colours live in `shared/types/pokemon.ts` because they
-   are domain data, not chrome.
+   Values come from the `PokeDex Collections.dc.html` design canvas: a neutral
+   near-white shell, one warm accent, and the Pokémon artwork carrying the
+   colour. Type colours are domain data and live in
+   `shared/types/pokemon.ts`, not here.
    ────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  --bg: #f7f7f8;
+  --bg: #f6f7f8;
   --surface: #ffffff;
-  --surface-muted: #f1f1f4;
+  --surface-muted: #ebebeb;
 
-  --border: #e6e6ea;
-  --border-strong: #d5d5dc;
+  --border: #ebebeb;
+  --border-input: #d9d9d9;
+  --border-strong: #bdbdbd;
+  --border-dashed: #d4d4d4;
 
-  --text: #16171c;
-  --text-muted: #55575f;
-  --text-subtle: #8b8d97;
+  --text: #111116;
+  --text-muted: #717171;
+  --text-subtle: #a0a0a0;
 
-  --accent: #4f46e5;
-  --accent-strong: #4338ca;
-  --accent-soft: #eceafd;
+  --accent: #f37731;
+  --accent-hover: #e0661f;
+  --accent-strong: #d95707;
+  --accent-soft: #fff0e2;
+  --accent-ring: rgb(243 119 49 / 18%);
   --accent-contrast: #ffffff;
 
-  --heart: #e11d48;
-  --danger: #c2334a;
-  --danger-soft: #fdf1f3;
+  --ink: #111116;
+  --ink-hover: #2a2a30;
+
+  --danger: #c22e28;
+  --danger-soft: #fdeaea;
 
   --radius-sm: 8px;
-  --radius-md: 14px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
 
-  --shadow-sm: 0 1px 2px rgb(16 17 28 / 4%);
-  --shadow-md: 0 12px 28px -12px rgb(16 17 28 / 18%);
+  --shadow-sm: 0 1px 2px rgb(17 17 22 / 8%);
+  --shadow-md: 0 8px 20px rgb(17 17 22 / 7%);
+  --shadow-lg: 0 10px 24px rgb(17 17 22 / 8%);
 
   --dur-fast: 150ms;
-  --dur-mid: 190ms;
-  --dur-slow: 240ms;
-  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-mid: 200ms;
+  --dur-slow: 250ms;
+  --ease: ease;
+  --ease-spring: cubic-bezier(0.2, 0.8, 0.3, 1.3);
 
-  --nav-height: 3.75rem;
-  --content-max: 76rem;
+  --nav-height: 60px;
+  --content-max: 1440px;
+  --content-pad: 32px;
+}
+
+/* The design canvas is a single 1440px artboard and specifies no small-screen
+   behaviour. These two steps are ours: the shell gutter tightens so narrow
+   viewports spend their width on content rather than margin. */
+@media (max-width: 720px) {
+  :root {
+    --content-pad: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --content-pad: 12px;
+  }
 }
 
 *,
@@ -61,14 +87,18 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1,
-h2,
-h3 {
-  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+button,
+input,
+select {
+  font-family: inherit;
 }
 
 a {
-  color: inherit;
+  color: var(--accent);
+}
+
+a:hover {
+  color: var(--accent-strong);
 }
 
 img {
@@ -80,20 +110,37 @@ img {
   outline-offset: 2px;
 }
 
-/* Shared entrance animations, used by cards and empty states. */
-@keyframes fade-in {
-  from {
-    opacity: 0;
+/* ── Shared animations ──────────────────────────────────────────────────────
+   Named after the design canvas' own keyframes so the two stay traceable. */
+
+@keyframes pdc-pop {
+  0% {
+    transform: scale(1);
   }
-  to {
-    opacity: 1;
+  35% {
+    transform: scale(1.4);
+  }
+  65% {
+    transform: scale(0.88);
+  }
+  100% {
+    transform: scale(1);
   }
 }
 
-@keyframes fade-in-up {
+@keyframes pdc-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes pdc-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;

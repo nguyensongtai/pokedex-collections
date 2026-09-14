@@ -1,16 +1,27 @@
 .badge {
-  --badge-color: var(--text-muted);
+  --badge-color: #999999;
 
   display: inline-flex;
   align-items: center;
-  padding: 0.2rem 0.55rem;
-  border: 1px solid color-mix(in srgb, var(--badge-color) 28%, transparent);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--badge-color) 14%, var(--surface));
-  color: color-mix(in srgb, var(--badge-color) 72%, #14151a);
-  font-size: 0.72rem;
+  /* Mixing in oklch keeps every type chip at a consistent perceived lightness,
+     which srgb mixing does not — yellows came out far brighter than purples. */
+  background: color-mix(in oklch, var(--badge-color) 22%, white);
+  color: color-mix(in oklch, var(--badge-color) 55%, #111116);
+  border: 1px solid color-mix(in oklch, var(--badge-color) 38%, white);
   font-weight: 600;
-  letter-spacing: 0.03em;
   text-transform: capitalize;
+  white-space: nowrap;
   line-height: 1.35;
+}
+
+.md {
+  padding: 3px 9px;
+  font-size: 11.5px;
+  letter-spacing: 0.01em;
+}
+
+.sm {
+  padding: 2px 8px;
+  font-size: 11px;
 }
