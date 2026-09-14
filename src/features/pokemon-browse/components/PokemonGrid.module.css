@@ -2,7 +2,7 @@
   display: grid;
   /* Fluid from 375px to 1920px: auto-fill decides the column count. */
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
-  gap: 1rem;
+  gap: 16px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -10,24 +10,89 @@
 
 .grid > li {
   display: flex;
+  min-width: 0;
 }
 
-/* Two columns still fit at 375px; the wider track takes over from 600px up. */
-@media (min-width: 600px) {
+@media (max-width: 480px) {
   .grid {
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 140px), 1fr));
+    gap: 12px;
   }
 }
 
-.skeleton {
-  height: 17.5rem;
+@media (min-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 184px), 1fr));
+  }
+}
+
+/* ── Loading ──────────────────────────────────────────────────────────────── */
+
+.skeletonCard {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.skeletonMedia {
+  aspect-ratio: 1;
   border-radius: var(--radius-md);
 }
+
+.skeletonName {
+  width: 60%;
+  height: 14px;
+  margin-top: 14px;
+  border-radius: 999px;
+}
+
+.skeletonTypes {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.skeletonType {
+  width: 52px;
+  height: 20px;
+  border-radius: 999px;
+}
+
+/* ── Empty ────────────────────────────────────────────────────────────────── */
+
+.empty {
+  padding: 80px 20px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.emptyMark {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 16px;
+  border-radius: 999px;
+  background: var(--surface-muted);
+}
+
+.emptyTitle {
+  margin: 0;
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.emptyHint {
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+
+/* ── Pagination ───────────────────────────────────────────────────────────── */
 
 .more {
   display: flex;
   justify-content: center;
-  padding: 2rem 0 0.5rem;
+  margin-top: 36px;
 }
 
 .srOnly {

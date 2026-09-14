@@ -3,6 +3,7 @@
 import { usePokemonSearch } from '../hooks/usePokemonSearch';
 import { PokemonGrid } from './PokemonGrid';
 import { SearchBar } from './SearchBar';
+import { useTranslation } from '@/shared/i18n';
 import styles from './BrowseView.module.css';
 
 /**
@@ -11,28 +12,44 @@ import styles from './BrowseView.module.css';
  * that only composes this, so route files keep zero business logic.
  */
 export function BrowseView() {
+  const t = useTranslation();
   const {
     query,
     setQuery,
+    clearQuery,
     results,
     status,
     error,
     isEmpty,
     totalMatches,
+    totalPokemon,
     hasMore,
-    isLoadingMore,
-    loadMore,
+    remaining,
+    showMore,
     retry,
   } = usePokemonSearch();
 
+  const resultLabel =
+    status === 'loading'
+      ? t.loading
+      : status === 'error'
+        ? ''
+        : query.trim()
+          ? `${totalMatches.toLocaleString()} ${t.of} ${totalPokemon.toLocaleString()} ${t.pokemon}`
+          : `${totalPokemon.toLocaleString()} ${t.pokemon}`;
+
   return (
-    <div className={styles.view}>
-      <SearchBar
-        value={query}
-        onChange={setQuery}
-        resultCount={status === 'ready' ? totalMatches : null}
-        isBusy={status === 'loading' || isLoadingMore}
-      />
+    <>
+      <div className={styles.header}>
+        <div>
+          <h1 className={styles.title}>{t.browse}</h1>
+          <p className={styles.resultLabel} role="status">
+            {resultLabel}
+          </p>
+        </div>
+
+        <SearchBar value={query} onChange={setQuery} onClear={clearQuery} />
+      </div>
 
       <PokemonGrid
         results={results}
@@ -41,10 +58,10 @@ export function BrowseView() {
         isEmpty={isEmpty}
         query={query}
         hasMore={hasMore}
-        isLoadingMore={isLoadingMore}
-        onLoadMore={loadMore}
+        remaining={remaining}
+        onShowMore={showMore}
         onRetry={retry}
       />
-    </div>
+    </>
   );
 }

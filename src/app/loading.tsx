@@ -7,9 +7,10 @@ import styles from './loading.module.css';
 export default function BrowseLoading() {
   return (
     <div className={styles.wrapper} aria-busy="true">
-      <span className={styles.srOnly}>Loading page</span>
-      <Skeleton className={styles.heading} />
-      <Skeleton className={styles.search} />
+      <div className={styles.header}>
+        <Skeleton className={styles.title} />
+        <Skeleton className={styles.search} />
+      </div>
       <div className={styles.grid}>
         {Array.from({ length: 12 }, (_, index) => (
           <Skeleton key={index} className={styles.card} />

@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { TypeBadge } from './TypeBadge';
 // ── Deliberate one-way feature dependency ───────────────────────────────────
 // `pokemon-browse` -> `favourites` (public API only). The reverse import is
@@ -6,13 +5,17 @@ import { TypeBadge } from './TypeBadge';
 // feature. The pragmatic alternative — passing a favourite-toggle slot down
 // from the page — was rejected as prop-drilling for no real gain here.
 import { FavouriteButton } from '@/features/favourites';
-import { Card } from '@/shared/ui';
-import { formatPokemonName, type PokemonSummary } from '@/shared/types/pokemon';
+import { Artwork, Card } from '@/shared/ui';
+import {
+  formatDexNumber,
+  formatPokemonName,
+  type PokemonSummary,
+} from '@/shared/types/pokemon';
 import styles from './PokemonCard.module.css';
 
 interface PokemonCardProps {
   pokemon: PokemonSummary;
-  /** Stagger index for the grid fade-in. */
+  /** Position in the grid; drives the entrance stagger and the LCP hint. */
   index: number;
 }
 
@@ -22,41 +25,34 @@ export function PokemonCard({ pokemon, index }: PokemonCardProps) {
 
   return (
     <Card
+      as="article"
       interactive
       className={styles.card}
       style={{ animationDelay: `${Math.min(index, 11) * 25}ms` }}
     >
+      <FavouriteButton pokemon={pokemon} className={styles.favourite} />
+
       <div className={styles.media}>
-        {pokemon.spriteUrl ? (
-          <Image
-            src={pokemon.spriteUrl}
-            alt={`${displayName} official artwork`}
-            fill
-            sizes="(max-width: 640px) 45vw, (max-width: 1200px) 25vw, 220px"
-            // The first row is above the fold on every viewport — loading it
-            // eagerly is what Next's LCP hint asks for.
-            priority={index < 4}
-            className={styles.image}
-          />
-        ) : (
-          <span className={styles.fallback} aria-hidden="true">
-            ?
-          </span>
-        )}
-        <FavouriteButton pokemon={pokemon} className={styles.favourite} />
+        <Artwork
+          src={pokemon.spriteUrl}
+          alt={`${displayName} official artwork`}
+          sizes="(max-width: 640px) 45vw, (max-width: 1200px) 25vw, 220px"
+          priority={index < 6}
+        />
       </div>
 
-      <div className={styles.body}>
-        <p className={styles.number}>#{String(pokemon.id).padStart(4, '0')}</p>
+      <div className={styles.heading}>
         <h2 className={styles.name}>{displayName}</h2>
-        <ul className={styles.types}>
-          {pokemon.types.map((type) => (
-            <li key={type}>
-              <TypeBadge type={type} />
-            </li>
-          ))}
-        </ul>
+        <span className={styles.number}>{formatDexNumber(pokemon.id)}</span>
       </div>
+
+      <ul className={styles.types}>
+        {pokemon.types.map((type) => (
+          <li key={type}>
+            <TypeBadge type={type} />
+          </li>
+        ))}
+      </ul>
     </Card>
   );
 }

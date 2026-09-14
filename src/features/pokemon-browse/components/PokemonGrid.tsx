@@ -1,9 +1,9 @@
 'use client';
 
 import { PokemonCard } from './PokemonCard';
-import { PAGE_SIZE } from '../api';
 import type { SearchStatus } from '../hooks/usePokemonSearch';
-import { Button, EmptyState, Skeleton, Spinner } from '@/shared/ui';
+import { useTranslation } from '@/shared/i18n';
+import { Button, ErrorState, Skeleton } from '@/shared/ui';
 import type { PokemonSummary } from '@/shared/types/pokemon';
 import styles from './PokemonGrid.module.css';
 
@@ -14,10 +14,12 @@ interface PokemonGridProps {
   isEmpty: boolean;
   query: string;
   hasMore: boolean;
-  isLoadingMore: boolean;
-  onLoadMore: () => void;
+  remaining: number;
+  onShowMore: () => void;
   onRetry: () => void;
 }
+
+const SKELETON_COUNT = 12;
 
 /**
  * Every data view in this app handles exactly three states, and this is the
@@ -31,20 +33,20 @@ export function PokemonGrid({
   isEmpty,
   query,
   hasMore,
-  isLoadingMore,
-  onLoadMore,
+  remaining,
+  onShowMore,
   onRetry,
 }: PokemonGridProps) {
+  const t = useTranslation();
+
   if (status === 'error') {
     return (
-      <EmptyState
-        tone="error"
-        icon="⚠️"
-        title="We couldn’t load the Pokédex"
-        description={error ?? 'Something went wrong. Please try again.'}
+      <ErrorState
+        title={t.errTitle}
+        description={error ? `${error}. ${t.errHint}` : t.errHint}
         action={
           <Button variant="primary" onClick={onRetry}>
-            Try again
+            {t.retry}
           </Button>
         }
       />
@@ -54,9 +56,16 @@ export function PokemonGrid({
   if (status === 'loading') {
     return (
       <div className={styles.grid} aria-busy="true" aria-live="polite">
-        <span className={styles.srOnly}>Loading Pokémon</span>
-        {Array.from({ length: PAGE_SIZE }, (_, index) => (
-          <Skeleton key={index} className={styles.skeleton} />
+        <span className={styles.srOnly}>{t.loading}</span>
+        {Array.from({ length: SKELETON_COUNT }, (_, index) => (
+          <div key={index} className={styles.skeletonCard}>
+            <Skeleton className={styles.skeletonMedia} />
+            <Skeleton className={styles.skeletonName} />
+            <div className={styles.skeletonTypes}>
+              <Skeleton className={styles.skeletonType} />
+              <Skeleton className={styles.skeletonType} />
+            </div>
+          </div>
         ))}
       </div>
     );
@@ -64,11 +73,11 @@ export function PokemonGrid({
 
   if (isEmpty) {
     return (
-      <EmptyState
-        icon="🔍"
-        title={query.trim() ? `No Pokémon match “${query.trim()}”` : 'No Pokémon to show'}
-        description="Try a shorter search — partial names like “char” or “eon” work well."
-      />
+      <div className={styles.empty}>
+        <div className={styles.emptyMark} aria-hidden="true" />
+        <p className={styles.emptyTitle}>{t.noMatch(query.trim())}</p>
+        <p className={styles.emptyHint}>{t.noMatchHint}</p>
+      </div>
     );
   }
 
@@ -84,9 +93,8 @@ export function PokemonGrid({
 
       {hasMore ? (
         <div className={styles.more}>
-          <Button variant="secondary" onClick={onLoadMore} disabled={isLoadingMore}>
-            {isLoadingMore ? <Spinner label={null} /> : null}
-            {isLoadingMore ? 'Loading…' : 'Load more'}
+          <Button variant="secondary" onClick={onShowMore}>
+            {t.showMore(remaining.toLocaleString())}
           </Button>
         </div>
       ) : null}

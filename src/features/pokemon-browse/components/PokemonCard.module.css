@@ -1,80 +1,65 @@
 .card {
+  /* Surface, border, radius and hover-lift come from shared/ui/Card. */
   display: flex;
   flex-direction: column;
+  /* The card is a flex item inside its <li>; min-width:auto would let the
+     nowrap name push it past its grid track. */
+  min-width: 0;
+  width: 100%;
   height: 100%;
-  overflow: hidden;
-  animation: fade-in-up var(--dur-slow) var(--ease) both;
+  padding: 14px;
+  animation: pdc-in var(--dur-mid) var(--ease) both;
+}
+
+.favourite {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
 }
 
 .media {
   position: relative;
   aspect-ratio: 1;
-  background: radial-gradient(circle at 50% 40%, var(--surface-muted), var(--surface) 70%);
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--bg);
 }
 
-.image {
-  object-fit: contain;
-  padding: 8%;
-  transition: transform var(--dur-mid) var(--ease-spring);
-}
-
-.card:hover .image {
-  transform: scale(1.05);
-}
-
-.fallback {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  height: 100%;
-  color: var(--text-subtle);
-  font-size: 2.5rem;
-}
-
-.favourite {
-  position: absolute;
-  top: 0.6rem;
-  right: 0.6rem;
-}
-
-.body {
+.heading {
   display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  padding: 0.85rem 1rem 1rem;
-  border-top: 1px solid var(--border);
-}
-
-.number {
-  margin: 0;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: var(--text-subtle);
-  font-variant-numeric: tabular-nums;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
 }
 
 .name {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: 1.05rem;
+  /* Without this the nowrap name sets a min-content floor and the card
+     refuses to shrink into its grid track. */
+  min-width: 0;
+  overflow: hidden;
+  font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  color: var(--text);
-  overflow-wrap: anywhere;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.number {
+  flex: none;
+  color: var(--text-subtle);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
 .types {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.3rem;
-  margin: 0.1rem 0 0;
+  gap: 6px;
+  margin: 8px 0 0;
   padding: 0;
   list-style: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .card:hover .image {
-    transform: none;
-  }
 }
