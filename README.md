@@ -12,8 +12,9 @@ Vietnamese.
 Built with Next.js 16 (App Router), TypeScript in strict mode, Zustand + `persist`,
 CSS Modules, and Vitest.
 
-The UI implements the `PokeDex Collections.dc.html` design canvas — its palette,
-type scale, card and row layouts, empty/error/loading states, and its EN/VI copy.
+The UI implements a design mockup created with Claude Design during planning — its
+palette, type scale, card and row layouts, empty/error/loading states, and its EN/VI
+copy. The mockup is a planning artefact and is not part of this repository.
 
 ---
 
@@ -203,6 +204,10 @@ match "xyz"*). There are no blank screens and no unhandled promise rejections.
 
 ## Trade-offs made for the ~2-hour budget
 
+Core scope (both pages, favourites and groups, persistence, tests, CI) landed within
+roughly the 2-hour window; the Pokémon detail route and the final README polish were
+added afterwards as stretch work — visible in the commit history.
+
 - **"Show more" pagination instead of virtualisation.** ~1,025 entries filter fine
   client-side, but the DOM grows as you page; a virtualised grid would be the
   correct answer at ten times the size.
@@ -240,25 +245,24 @@ match "xyz"*). There are no blank screens and no unhandled promise rejections.
 
 ---
 
-## Where this departs from the design canvas
+## Where the implementation departs from the mockup
 
-The canvas is a single 1440px artboard rendered by the Design Canvas runtime. Four
-deliberate differences:
+The mockup is a single 1440px artboard. Five deliberate differences:
 
-- **Responsive behaviour is ours.** The canvas specifies none. Grids use
+- **Responsive behaviour is ours.** The mockup specifies none. Grids use
   `auto-fill minmax()` from 375px to 1920px, the shell gutter tightens at 720px and
   480px, the nav wordmark collapses to the Poké Ball mark (the link keeps its
   `aria-label`), and favourite rows stack their controls below 480px.
-- **Tap targets.** The canvas draws a 36px heart. The visual is unchanged, but a
+- **Tap targets.** The mockup draws a 36px heart. The visual is unchanged, but a
   transparent `::before` expands the *hit area* to 44×44 to clear the touch
   guideline.
-- **`:focus-visible`, not `:focus`.** The canvas' `style-focus` compiles to
+- **`:focus-visible`, not `:focus`.** The mockup's `style-focus` compiles to
   `:focus`, which lights the ring on mouse clicks too. Keyboard paths keep the ring;
   pointer paths don't.
-- **"0 groups".** The canvas' summary string always names a group count, so a fresh
+- **"0 groups".** The mockup's summary string always names a group count, so a fresh
   collection reads "3 Pokémon in 0 groups". With no groups yet it falls back to the
   plain count.
-- **Navigation is links, not click handlers.** The canvas models the detail screen
+- **Navigation is links, not click handlers.** The mockup models the detail screen
   as a `page` state: cards are `role="button"` divs, and Back returns to whichever
   screen you came from. With a real route per Pokémon those become `<a>` elements,
   so middle-click, right-click, "open in new tab" and the browser's own back button
@@ -356,11 +360,11 @@ pulling all 24 sprites at once, so the fix was to cap the widths, cache for 30
 days, and load only the first row eagerly. Production now reports zero failed
 image requests.
 
-**The design was adapted, not copied.** The canvas is a single 1440px artboard. It
-specifies no small-screen behaviour, uses `:focus` where `:focus-visible` belongs,
-draws a 36px tap target, and has a summary string that reads "3 Pokémon in 0
-groups" on a fresh collection. Each of those was changed deliberately and is
-listed under *Where this departs from the design canvas*.
+**The design was adapted, not copied.** The Claude Design mockup is a single 1440px
+artboard. It specifies no small-screen behaviour, uses `:focus` where
+`:focus-visible` belongs, draws a 36px tap target, and has a summary string that
+reads "3 Pokémon in 0 groups" on a fresh collection. Each of those was changed deliberately and is
+listed under *Where the implementation departs from the mockup*.
 
 Every claim in this README was checked by running the app, not by reading the
 code: the UI was exercised in a browser from 336px to 1600px, the full group
